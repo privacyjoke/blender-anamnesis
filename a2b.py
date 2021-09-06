@@ -89,14 +89,38 @@ def update(bone_name):
                 Q_zx = des_basis_matrix[2][0]
                 Q_zy = des_basis_matrix[2][1]
                 Q_zz = des_basis_matrix[2][2]
-                # assume that the trace is not negative
-                t = Q_xx + Q_yy + Q_zz
-                r = (1+t)**0.5
-                s = 1/(2*r)
-                w = r/2
-                x = (Q_xy - Q_yz)*s
-                y = (Q_xz - Q_zx)*s
-                z = (Q_yx - Q_xy)*s
+                tr = Q_xx + Q_yy + Q_zz
+                if tr >= 0:
+                    r = (1+tr)**0.5
+                    s = 1/(2*r)
+                    w = r/2
+                    x = (Q_xy - Q_yz)*s
+                    y = (Q_xz - Q_zx)*s
+                    z = (Q_yx - Q_xy)*s
+                else:
+                    max_diag = max(Q_xx, Q_yy, Q_zz)
+                    if Q_xx == max_diag:
+                        r = (1 + Q_xx - Q_yy - Q_zz)**0.5
+                        s = 1/(2*r)
+                        w = (Q_zy - Q_yz)*s
+                        x = r/2
+                        y = (Q_xy + Q_yx)*s
+                        z = (Q_zx + Q_xz)*s
+                    elif Q_yy == max_diag:
+                        r = (1 + Q_yy - Q_zz - Q_xx)**0.5
+                        s = 1/(2*r)
+                        w = (Q_xz - Q_zx)*s
+                        x = (Q_xy + Q_yx)*s
+                        y = r/2
+                        z = (Q_zy + Q_yz)*s
+                    else:
+                        r = (1 + Q_zz - Q_xx - Q_yy)**0.5
+                        s = 1/(2*r)
+                        w = (Q_yx - Q_xy)*s
+                        x = (Q_xz + Q_zx)*s
+                        y = (Q_yz + Q_zy)*s
+                        z = r/2
+                    
                 Q_new = Quaternion()
                 Q_new.x, Q_new.y, Q_new.z, Q_new.w = x, y, z, w
                 pose_bone.rotation_quaternion = Q_new
